@@ -18,7 +18,10 @@ private:
     typedef AComputerVisionPawn TVehiclePawn;
 
 protected:
-    virtual std::unique_ptr<msr::airlib::ApiServerBase> createApiServer() const override;
+    // [modified by superboySB]
+    // virtual std::unique_ptr<msr::airlib::ApiServerBase> createApiServer() const override;
+    virtual std::vector<std::unique_ptr<msr::airlib::ApiServerBase>> createApiServer() const override;
+
     virtual void getExistingVehiclePawns(TArray<AActor*>& pawns) const override;
     virtual bool isVehicleTypeSupported(const std::string& vehicle_type) const override;
     virtual std::string getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const override;
@@ -29,4 +32,7 @@ protected:
         const PawnSimApi::Params& pawn_sim_api_params) const override;
     virtual msr::airlib::VehicleApiBase* getVehicleApi(const PawnSimApi::Params& pawn_sim_api_params,
                                                        const PawnSimApi* sim_api) const override;
+    // [modified by superboySB]
+    virtual bool isPaused() const override;
+    virtual void pause(bool is_paused) override;
 };

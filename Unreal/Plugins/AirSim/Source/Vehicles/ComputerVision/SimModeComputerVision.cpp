@@ -16,15 +16,29 @@
 #include "physics/Kinematics.hpp"
 #include "api/RpcLibServerBase.hpp"
 
-std::unique_ptr<msr::airlib::ApiServerBase> ASimModeComputerVision::createApiServer() const
+// [modified by superboySB]
+// std::unique_ptr<msr::airlib::ApiServerBase> ASimModeComputerVision::createApiServer() const
+// {
+// #ifdef AIRLIB_NO_RPC
+//     return ASimModeBase::createApiServer();
+// #else
+//     return std::unique_ptr<msr::airlib::ApiServerBase>(new msr::airlib::RpcLibServerBase(
+//         getApiProvider(), getSettings().api_server_address, getSettings().api_port));
+// #endif
+// }
+std::vector<std::unique_ptr<msr::airlib::ApiServerBase>> ASimModeComputerVision::createApiServer() const
 {
+    std::vector<std::unique_ptr<msr::airlib::ApiServerBase>> api_servers;
 #ifdef AIRLIB_NO_RPC
-    return ASimModeBase::createApiServer();
+    api_servers.push_back(ASimModeBase::createApiServer());
+    return api_servers;
 #else
-    return std::unique_ptr<msr::airlib::ApiServerBase>(new msr::airlib::RpcLibServerBase(
-        getApiProvider(), getSettings().api_server_address, getSettings().api_port));
+    api_servers.push_back(std::unique_ptr<msr::airlib::ApiServerBase>(new msr::airlib::RpcLibServerBase(
+        getApiProvider(), getSettings().api_server_address, getSettings().api_port)));
+    return api_servers;
 #endif
 }
+
 
 void ASimModeComputerVision::getExistingVehiclePawns(TArray<AActor*>& pawns) const
 {
@@ -75,3 +89,15 @@ msr::airlib::VehicleApiBase* ASimModeComputerVision::getVehicleApi(const PawnSim
     //we don't have real vehicle so no vehicle API
     return nullptr;
 }
+
+// [modified by superboySB]
+bool ASimModeComputerVision::isPaused() const
+{
+    return UGameplayStatics::IsGamePaused(this->GetWorld());
+}
+
+void ASimModeComputerVision::pause(bool is_paused)
+{
+    UGameplayStatics::SetGamePaused(this->GetWorld(), is_paused);
+}
+

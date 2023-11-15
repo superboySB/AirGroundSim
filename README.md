@@ -1,10 +1,12 @@
 # AirGroundSim
-同时仿真车辆和无人机以支持相关研究
+同时仿真车辆和无人机以支持空地协同相关研究
 
 ## 研究进度
-[ ] 尝试PhysX下的车机并存
+[X] 尝试PhysX下的车机并存
 
 [ ] 尝试引入PX4 SITL
+
+[ ] 尝试用airsim的data recorder训练机载大模型，再用PX4 SITL方式验证这个工作：https://github.com/alaamaalouf/FollowAnything
 
 ## 部署流程
 目前先在windows场景上做测试，基本安装流程参考宁子安的知乎[讲解1](https://zhuanlan.zhihu.com/p/618440744)、[讲解2](https://zhuanlan.zhihu.com/p/619214564)、[讲解3](https://zhuanlan.zhihu.com/p/620006613)，一些关键的用法大佬都已经给出。这里只补充一些对于本项目单独的流程.....
@@ -26,6 +28,7 @@
  }
 }
 ```
+运行
 
 ## TroubleShooting
 ##### 1. 可以换一台网络好的机器直接拉镜像副本，解决docker拉不下来的问题

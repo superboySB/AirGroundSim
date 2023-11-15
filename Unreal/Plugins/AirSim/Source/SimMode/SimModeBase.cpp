@@ -8,6 +8,7 @@
 #include "Misc/OutputDeviceNull.h"
 #include "Engine/World.h"
 
+#include <map>
 #include <memory>
 #include "AirBlueprintLib.h"
 #include "common/AirSimSettings.hpp"
@@ -195,7 +196,9 @@ void ASimModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
     FRecordingThread::killRecording();
     world_sim_api_.reset();
     api_provider_.reset();
-    api_server_.reset();
+    // [modified by superboySB]
+    // api_server_.reset();
+    api_servers_.clear();
     global_ned_transform_.reset();
 
     CameraDirector = nullptr;
@@ -312,10 +315,16 @@ void ASimModeBase::setWind(const msr::airlib::Vector3r& wind) const
     throw std::domain_error("setWind not implemented by SimMode");
 }
 
-std::unique_ptr<msr::airlib::ApiServerBase> ASimModeBase::createApiServer() const
+// [modified by superboySB]
+// std::unique_ptr<msr::airlib::ApiServerBase> ASimModeBase::createApiServer() const
+// {
+//     //this will be the case when compilation with RPCLIB is disabled or simmode doesn't support APIs
+//     return nullptr;
+// }
+std::vector<std::unique_ptr<msr::airlib::ApiServerBase>> ASimModeBase::createApiServer() const
 {
     //this will be the case when compilation with RPCLIB is disabled or simmode doesn't support APIs
-    return nullptr;
+    return {};
 }
 
 void ASimModeBase::setupClockSpeed()
@@ -538,31 +547,62 @@ void ASimModeBase::startApiServer()
     if (getSettings().enable_rpc) {
 
 #ifdef AIRLIB_NO_RPC
-        api_server_.reset();
+        // [modified by superboySB]
+        // api_server_.reset();
+        if (!api_servers_.empty())
+        {
+            for (auto& api_server : api_servers_)
+            {
+                api_server->stop();
+            }
+            api_servers_.clear();
+        }
 #else
-        api_server_ = createApiServer();
+        // [modified by superboySB]
+        // api_server_ = createApiServer();
+        api_servers_ = createApiServer();
 #endif
-
-        try {
-            api_server_->start(false, spawned_actors_.Num() + 4);
-        }
-        catch (std::exception& ex) {
-            UAirBlueprintLib::LogMessageString("Cannot start RpcLib Server", ex.what(), LogDebugLevel::Failure);
-        }
+        // [modified by superboySB]
+        // try {
+        //     api_server_->start(false, spawned_actors_.Num() + 4);
+        // }
+        // catch (std::exception& ex) {
+        //     UAirBlueprintLib::LogMessageString("Cannot start RpcLib Server", ex.what(), LogDebugLevel::Failure);
+        // }
+        for (auto& api_server : api_servers_){
+            try {
+                api_server->start(false, spawned_actors_.Num() + 4);
+            }
+            catch (std::exception& ex) {
+                UAirBlueprintLib::LogMessageString("Cannot start RpcLib Server", ex.what(), LogDebugLevel::Failure);
+            }
+        } 
     }
     else
         UAirBlueprintLib::LogMessageString("API server is disabled in settings", "", LogDebugLevel::Informational);
 }
+
 void ASimModeBase::stopApiServer()
 {
-    if (api_server_ != nullptr) {
-        api_server_->stop();
-        api_server_.reset(nullptr);
+    // [modified by superboySB]
+    // if (api_server_ != nullptr) {
+    //     api_server_->stop();
+    //     api_server_.reset(nullptr);
+    // }
+    if (!api_servers_.empty())
+    {
+        for (auto& api_server : api_servers_)
+        {
+            api_server->stop();
+        }
     }
+    api_servers_.clear();
 }
 bool ASimModeBase::isApiServerStarted()
-{
-    return api_server_ != nullptr;
+{   
+    // [modified by superboySB]
+    // return api_server_ != nullptr;
+    return api_servers_.empty();
 }
 
 void ASimModeBase::updateDebugReport(msr::airlib::StateReporterWrapper& debug_reporter)
@@ -702,6 +742,7 @@ void ASimModeBase::setupVehiclesAndCamera()
         }
         else {
             //add vehicles from settings
+            // bool fpv_flag = true;
             for (const auto& vehicle_setting_pair : getSettings().vehicles) {
                 //if vehicle is of type for derived SimMode and auto creatable
                 const auto& vehicle_setting = *vehicle_setting_pair.second;
@@ -713,6 +754,15 @@ void ASimModeBase::setupVehiclesAndCamera()
 
                     if (vehicle_setting.is_fpv_vehicle)
                         fpv_pawn = spawned_pawn;
+                    
+                    // [modified by superboySB]
+                    if (getSettings().simmode_name == "Both"){
+                        // if (vehicle_setting.vehicle_type == "PhysXCar" && fpv_flag){
+                        //     fpv_flag = false;
+                        //     fpv_pawn = spawned_pawn;
+                        // }
+                        addPawnToMap(spawned_pawn, vehicle_setting.vehicle_type);
+                    }
                 }
             }
         }
@@ -913,4 +963,17 @@ void ASimModeBase::drawDistanceSensorDebugPoints()
             }
         }
     }
+}
+
+// [modified by superboySB]
+void ASimModeBase::addPawnToMap(APawn* pawn, const std::string& vehicle_type) const
+{
+    pawn_to_vehichle_.insert(std::pair<APawn*, const std::string>(pawn, vehicle_type));
+}
+std::string ASimModeBase::getVehicleType(APawn* pawn) const
+{
+    std::map<APawn*, std::string>::const_iterator it = pawn_to_vehichle_.find(pawn);
+    if (it != pawn_to_vehichle_.end())
+        return it->second;
+    return nullptr;
 }
