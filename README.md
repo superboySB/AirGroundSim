@@ -28,10 +28,24 @@
             "Z": -5,
             "Yaw": 0
         },
+        "Drone2": {
+            "VehicleType": "SimpleFlight",
+            "X": 5,
+            "Y": 5,
+            "Z": -5,
+            "Yaw": 0
+        },
         "Car1": {
             "VehicleType": "PhysXCar",
             "X": 0,
             "Y": 0,
+            "Z": -1,
+            "Yaw": 0
+        },
+        "Car2": {
+            "VehicleType": "PhysXCar",
+            "X": 10,
+            "Y": 10,
             "Z": -1,
             "Yaw": 0
         }
@@ -144,7 +158,7 @@ export PX4_SIM_HOST_ADDR=172.18.240.1
 
 ##### 5. 我不想用windows,我想全放在安装了ubuntu的本机上做仿真、算法、PX4（我懒得搞环境）
 
-为了测试后续ROS2的offboard功能，可以把我构建的docker container作为虚拟机，后续验证流程可以参考这个[教程](https://github.com/Jaeyoung-Lim/px4-offboard/blob/master/doc/ROS2_PX4_Offboard_Tutorial.md)。如果不想用两台机器，想用一台机器做，可以考虑将Dockerfile中的github-token补全，并且取消对UE、Airsim编译的注释，运行`docker build -t mypx4_image:full .`，预计会生成一个300GB左右的image，请留好空间。
+为了测试后续ROS2的offboard功能，可以把我构建的docker container作为虚拟机，后续验证流程可以参考这个[教程](https://github.com/Jaeyoung-Lim/px4-offboard/blob/master/doc/ROS2_PX4_Offboard_Tutorial.md)。如果不想用两台机器，想用一台机器做，可以考虑将[我的Dockerfile](https://github.com/superboySB/AirGroundSim/blob/main/docker/ros2px4/Dockerfile)中的github-token补全，并且取消对UE、Airsim编译的注释，运行`docker build -t mypx4_image:full .`，预计会生成一个300GB左右的image，请留好空间。
 
 
 ## [ROS用户选用-测试中] 使用mavros
