@@ -2,17 +2,17 @@
 同时仿真车辆和无人机以支持空地协同相关研究
 
 ## 研究进度
-[X] 尝试PhysX下的车机并存（暂时不支持RC切换，建议使用脚本控制）
+- [X] 尝试PhysX下的车机并存（暂时不支持RC切换，建议使用脚本控制）
 
-[X] 尝试引入PX4 SITL
+- [X] 尝试引入PX4 SITL
 
-[ ] 添加PythonClient全面支持
+- [ ] 添加PythonClient全面支持
 
-[ ] 添加ROS/ROS2全面支持
+- [ ] 添加ROS/ROS2全面支持
 
-[ ] 验证PX4在gazebo上的自主起降demo，看看能否在airsim跑通 (也可以参考一下[amov](https://wiki.amovlab.com/public/prometheus-wiki/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E6%A8%A1%E5%9D%97-object_detection/%E6%95%99%E5%AD%A6%E4%BE%8B%E7%A8%8B/%E4%BA%8C%E7%BB%B4%E7%A0%81%E6%8E%A2%E5%AF%BB%E9%99%8D%E8%90%BD.html)、[xtdrone](https://github.com/robin-shaun/XTDrone))
+- [ ] 验证PX4在gazebo上的自主起降demo，看看能否在airsim跑通 (也可以参考一下[amov](https://wiki.amovlab.com/public/prometheus-wiki/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E6%A8%A1%E5%9D%97-object_detection/%E6%95%99%E5%AD%A6%E4%BE%8B%E7%A8%8B/%E4%BA%8C%E7%BB%B4%E7%A0%81%E6%8E%A2%E5%AF%BB%E9%99%8D%E8%90%BD.html)、[xtdrone](https://github.com/robin-shaun/XTDrone))
 
-[ ] 尝试用airsim的data recorder训练机载大模型，再用PX4 SITL方式验证这个工作：https://github.com/alaamaalouf/FollowAnything
+- [ ] 尝试用airsim的data recorder训练机载大模型，再用PX4 SITL方式验证这个工作：https://github.com/alaamaalouf/FollowAnything
 
 ## 简单部署流程
 目前先在windows场景上做测试，基本安装流程参考宁子安的知乎[讲解1](https://zhuanlan.zhihu.com/p/618440744)、[讲解2](https://zhuanlan.zhihu.com/p/619214564)、[讲解3](https://zhuanlan.zhihu.com/p/620006613)，一些关键的用法大佬都已经给出。这里只补充一些对于本项目单独的流程，首先按上述讲解编译代码、进入block例程后，设置`settings.json`内容如下（所有可能的参数模板见下[教程](https://microsoft.github.io/AirSim/settings/)）
