@@ -38,6 +38,9 @@
 #include "sensors/imu/ImuBase.hpp"
 #include "sensors/magnetometer/MagnetometerBase.hpp"
 
+// can use only when the project is pre-compiled
+// #include "AirBlueprintLib.h"
+
 namespace msr
 {
 namespace airlib
@@ -316,6 +319,12 @@ namespace airlib
             return current_state_.controls.landed ? LandedState::Landed : LandedState::Flying;
         }
 
+        // [Modified by superboySB] return what we received last time through setRCData
+        virtual RCData getRCData() const override
+        {
+            return last_rcData_;
+        }
+
         virtual real_T getActuation(unsigned int rotor_index) const override
         {
             if (!is_simulation_mode_)
@@ -328,6 +337,29 @@ namespace airlib
         virtual size_t getActuatorCount() const override
         {
             return RotorControlsCount;
+        }
+
+        virtual void moveByRC(const RCData& rc_data) override   
+        {
+            setRCData(rc_data);
+        }
+
+        // [Modified by superboySB]
+        virtual bool setRCData(const RCData& rc_data) override
+        {
+            last_rcData_ = rc_data;
+            if (rc_data.is_valid) {
+                // UAirBlueprintLib::LogMessageString("[DEBUG] Joystick (T,R,P,Y,Buttons): ", Utils::stringf("%f, %f, %f,%f,%s", rc_data.throttle, rc_data.roll, rc_data.pitch, rc_data.yaw, Utils::toBinaryString(rc_data.switches).c_str()), LogDebugLevel::Informational);
+                // UAirBlueprintLib::LogMessageString("RC Mode: ", rc_data.getSwitch(0) == 0 ? "Angle" : "Rate", LogDebugLevel::Informational);
+                manual_control_message_.target = hil_rc_target_system;
+                manual_control_message_.x = static_cast<int16_t>(rc_data.pitch * 1000);
+                manual_control_message_.y = static_cast<int16_t>(rc_data.roll * 1000);
+                manual_control_message_.z = static_cast<int16_t>(rc_data.throttle * 1000);
+                manual_control_message_.r = static_cast<int16_t>(rc_data.yaw * 1000);
+                manual_control_message_.buttons = static_cast<uint16_t>(rc_data.switches);
+            }
+
+            return true;
         }
 
         virtual bool armDisarm(bool arm) override
@@ -1005,6 +1037,7 @@ namespace airlib
         }
 
         //TODO: this method used to send collision to external sim. Do we still need this?
+        // [superboySB] currently seems not used
         void sendCollision(float normalX, float normalY, float normalZ)
         {
             checkValidVehicle();
@@ -1397,6 +1430,7 @@ namespace airlib
             }
         }
 
+        // procress mavlink messages of vehicles
         void processControlMessages(const mavlinkcom::MavLinkMessage& msg)
         {
             // Utils::log(Utils::stringf("Control msg %d", msg.msgid));
@@ -1586,6 +1620,8 @@ namespace airlib
 
         void processQgcMessages(const mavlinkcom::MavLinkMessage& msg)
         {
+            // [modified by superboySB]
+            addStatusMessage(Utils::stringf("Received QgcMessages %d", msg.msgid));
             if (msg.msgid == MocapPoseMessage.msgid) {
                 std::lock_guard<std::mutex> guard(mocap_pose_mutex_);
                 MocapPoseMessage.decode(msg);
@@ -1680,6 +1716,20 @@ namespace airlib
                     rotor_controls_[5] = HilControlsMessage.aux2;
                     rotor_controls_[6] = HilControlsMessage.aux3;
                     rotor_controls_[7] = HilControlsMessage.aux4;
+                    
+                    normalizeRotorControls();
+                    
+                    // [modified by superboySB]
+                    // UAirBlueprintLib::LogMessageString("[DEBUG] control_message:", 
+                    //     Utils::stringf("%f, %f, %f, %f, %f, %f, %f, %f", 
+                    //         rotor_controls_[0], 
+                    //         rotor_controls_[1], 
+                    //         rotor_controls_[2], 
+                    //         rotor_controls_[3],
+                    //         rotor_controls_[4],
+                    //         rotor_controls_[5],
+                    //         rotor_controls_[6],
+                    //         rotor_controls_[7]), LogDebugLevel::Informational);
 
                     normalizeRotorControls();
                     handleLockStep();
@@ -1701,6 +1751,18 @@ namespace airlib
                     }
                 }
                 if (isarmed) {
+                    // [modified by superboySB]
+                    // UAirBlueprintLib::LogMessageString("[DEBUG] rotor_controls:", 
+                    //     Utils::stringf("%f, %f, %f, %f, %f, %f, %f, %f", 
+                    //         rotor_controls_[0], 
+                    //         rotor_controls_[1], 
+                    //         rotor_controls_[2], 
+                    //         rotor_controls_[3],
+                    //         rotor_controls_[4],
+                    //         rotor_controls_[5],
+                    //         rotor_controls_[6],
+                    //         rotor_controls_[7]), LogDebugLevel::Informational);
+
                     normalizeRotorControls();
                 }
 
@@ -1746,6 +1808,11 @@ namespace airlib
                 // this is a good time to send the params
                 send_params_ = true;
             }
+            else if (msg.msgid == mavlinkcom::MavLinkPing::kMessageId) { // [modified by superboySB]
+                mavlinkcom::MavLinkPing ping_message;
+                ping_message.decode(msg);
+                hil_rc_target_system = ping_message.target_system;
+            }
             else {
                 // creates too much log output, only do this when debugging this issue specifically.
                 // Utils::log(Utils::stringf("Ignoring msg %d from %d,%d ", msg.msgid, msg.compid, msg.sysid));
@@ -1788,7 +1855,28 @@ namespace airlib
             }
 
             if (hil_node_ != nullptr) {
+                // [modified by superboySB]
+                // addStatusMessage(Utils::stringf("Send HIL_SENSOR message: %f, %f, %f, %f, %f, %f",
+                //                 hil_sensor.xacc,
+                //                 hil_sensor.yacc,
+                //                 hil_sensor.zacc,
+                //                 hil_sensor.xgyro,
+                //                 hil_sensor.ygyro,
+                //                 hil_sensor.zgyro)
+                //                 );
                 hil_node_->sendMessage(hil_sensor);
+
+                // [modified by superboySB]
+                // addStatusMessage(Utils::stringf("Send MANUAL_CONTROL message: %d, %d, %d, %d, %d, %d",
+                //                 manual_control_message_.target,
+                //                 manual_control_message_.x,
+                //                 manual_control_message_.y,
+                //                 manual_control_message_.z,
+                //                 manual_control_message_.r,
+                //                 manual_control_message_.buttons)
+                //                 );
+                hil_node_->sendMessage(manual_control_message_);
+
                 received_actuator_controls_ = false;
                 if (lock_step_active_ && world_ != nullptr) {
                     world_->pauseForTime(1); // 1 second delay max waiting for actuator controls.
@@ -1972,6 +2060,7 @@ namespace airlib
         mavlinkcom::MavLinkCommandLong CommandLongMessage;
         mavlinkcom::MavLinkLocalPositionNed MavLinkLocalPositionNed;
 
+        mavlinkcom::MavLinkManualControl manual_control_message_; // [modified by superboySB]
         mavlinkcom::MavLinkHilSensor last_sensor_message_;
         mavlinkcom::MavLinkDistanceSensor last_distance_message_;
         mavlinkcom::MavLinkHilGps last_gps_message_;
@@ -2032,6 +2121,10 @@ namespace airlib
         //this is why below two variables are marked as mutable
         mutable int state_version_;
         mutable mavlinkcom::VehicleState current_state_;
+
+        // [modified by superboySB]
+        RCData last_rcData_;
+        uint8_t hil_rc_target_system= 0;
     };
 }
 } //namespace

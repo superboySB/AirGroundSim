@@ -91,7 +91,8 @@ namespace airlib
 
             //transfer new input values from controller to rotors
             for (uint rotor_index = 0; rotor_index < rotors_.size(); ++rotor_index) {
-                rotors_.at(rotor_index).setControlSignal(vehicle_api_->getActuation(rotor_index));
+                // ger rotors speed from simulation
+                rotors_.at(rotor_index).setControlSignal(vehicle_api_->getActuation(rotor_index));  
             }
         }
 
