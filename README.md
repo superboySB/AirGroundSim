@@ -78,7 +78,6 @@ cd PythonClient && pip install -r requirements.txt && pip install -e .
     "Vehicles": {
         "UAV_0": {
             "VehicleType": "PX4Multirotor",
-            "PawnPath": "DefaultQuadrotor",
             "UseSerial": false,
             "LockStep": true,
             "UseTcp": true,
