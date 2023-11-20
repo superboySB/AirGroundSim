@@ -6,9 +6,8 @@
 
 using namespace msr::airlib;
 
-CarPawnSimApi::CarPawnSimApi(const Params& params,
-                             const msr::airlib::CarApiBase::CarControls& keyboard_controls)
-    : PawnSimApi(params), keyboard_controls_(keyboard_controls)
+CarPawnSimApi::CarPawnSimApi(const Params& params)
+    : PawnSimApi(params)
 {
 }
 
@@ -55,8 +54,8 @@ void CarPawnSimApi::updateRenderedState(float dt)
     vehicle_api_->getStatusMessages(vehicle_api_messages_);
 
     //TODO: do we need this for cars?
-    if (getRemoteControlID() >= 0)
-        vehicle_api_->setRCData(getRCData());
+    // if (getRemoteControlID() >= 0)
+    //     vehicle_api_->setRCData(getRCData());
 }
 void CarPawnSimApi::updateRendering(float dt)
 {
@@ -78,76 +77,80 @@ void CarPawnSimApi::updateRendering(float dt)
 
 void CarPawnSimApi::updateCarControls()
 {
-    auto rc_data = getRCData();
+    // auto rc_data = getRCData();
 
-    if (rc_data.is_initialized) {
-        if (!rc_data.is_valid) {
-            UAirBlueprintLib::LogMessageString("Control Mode: ", "[INVALID] Wheel/Joystick", LogDebugLevel::Informational);
-            return;
-        }
-        UAirBlueprintLib::LogMessageString("Control Mode: ", "Wheel/Joystick", LogDebugLevel::Informational);
+    // if (rc_data.is_initialized) {
+    //     if (!rc_data.is_valid) {
+    //         UAirBlueprintLib::LogMessageString("Control Mode: ", "[INVALID] Wheel/Joystick", LogDebugLevel::Informational);
+    //         return;
+    //     }
+    //     UAirBlueprintLib::LogMessageString("Control Mode: ", "Wheel/Joystick", LogDebugLevel::Informational);
 
-        //TODO: move this to SimModeBase?
-        //if ((joystick_state_.buttons & 4) | (joystick_state_.buttons & 1024)) { //X button or Start button
-        //    reset();
-        //    return;
-        //}
+    //     //TODO: move this to SimModeBase?
+    //     //if ((joystick_state_.buttons & 4) | (joystick_state_.buttons & 1024)) { //X button or Start button
+    //     //    reset();
+    //     //    return;
+    //     //}
 
-        // Thrustmaster devices
-        if (rc_data.vendor_id == "VID_044F") {
-            joystick_controls_.steering = rc_data.yaw;
-            joystick_controls_.throttle = (-rc_data.right_z + 1) / 2;
-            joystick_controls_.brake = rc_data.throttle;
+    //     // Thrustmaster devices
+    //     if (rc_data.vendor_id == "VID_044F") {
+    //         joystick_controls_.steering = rc_data.yaw;
+    //         joystick_controls_.throttle = (-rc_data.right_z + 1) / 2;
+    //         joystick_controls_.brake = rc_data.throttle;
 
-            auto car_state = vehicle_api_->getCarState();
-            float rumble_strength = 0.66 + (car_state.rpm / car_state.maxrpm) / 3;
-            float auto_center = (1.0 - 1.0 / (std::abs(car_state.speed / 120) + 1.0)) * (rc_data.yaw / 3);
-            setRCForceFeedback(rumble_strength, auto_center);
-        }
-        // Anything else, typically Logitech G920 wheel
-        else {
-            joystick_controls_.steering = (rc_data.throttle * 2 - 1) * 1.25;
-            joystick_controls_.throttle = (-rc_data.roll + 1) / 2;
-            joystick_controls_.brake = -rc_data.right_z + 1;
-        }
-        //Two steel levers behind wheel
-        joystick_controls_.handbrake = (rc_data.getSwitch(5)) | (rc_data.getSwitch(6)) ? 1 : 0;
+    //         auto car_state = vehicle_api_->getCarState();
+    //         float rumble_strength = 0.66 + (car_state.rpm / car_state.maxrpm) / 3;
+    //         float auto_center = (1.0 - 1.0 / (std::abs(car_state.speed / 120) + 1.0)) * (rc_data.yaw / 3);
+    //         setRCForceFeedback(rumble_strength, auto_center);
+    //     }
+    //     // Anything else, typically Logitech G920 wheel
+    //     else {
+    //         joystick_controls_.steering = (rc_data.throttle * 2 - 1) * 1.25;
+    //         joystick_controls_.throttle = (-rc_data.roll + 1) / 2;
+    //         joystick_controls_.brake = -rc_data.right_z + 1;
+    //     }
+    //     //Two steel levers behind wheel
+    //     joystick_controls_.handbrake = (rc_data.getSwitch(5)) | (rc_data.getSwitch(6)) ? 1 : 0;
 
-        if ((rc_data.getSwitch(8)) | (rc_data.getSwitch(1))) { //RSB button or B button
-            joystick_controls_.manual_gear = -1;
-            joystick_controls_.is_manual_gear = true;
-            joystick_controls_.gear_immediate = true;
-        }
-        else if ((rc_data.getSwitch(9)) | (rc_data.getSwitch(0))) { //LSB button or A button
-            joystick_controls_.manual_gear = 0;
-            joystick_controls_.is_manual_gear = false;
-            joystick_controls_.gear_immediate = true;
-        }
+    //     if ((rc_data.getSwitch(8)) | (rc_data.getSwitch(1))) { //RSB button or B button
+    //         joystick_controls_.manual_gear = -1;
+    //         joystick_controls_.is_manual_gear = true;
+    //         joystick_controls_.gear_immediate = true;
+    //     }
+    //     else if ((rc_data.getSwitch(9)) | (rc_data.getSwitch(0))) { //LSB button or A button
+    //         joystick_controls_.manual_gear = 0;
+    //         joystick_controls_.is_manual_gear = false;
+    //         joystick_controls_.gear_immediate = true;
+    //     }
 
-        current_controls_ = joystick_controls_;
-    }
-    // [modified by superboySB] let keyborad for computer vision only
+    //     current_controls_ = joystick_controls_;
+    // }
+    // // [modified by superboySB] let keyborad for computer vision only
     // else {
     //     UAirBlueprintLib::LogMessageString("Control Mode: ", "Keyboard", LogDebugLevel::Informational);
     //     current_controls_ = keyboard_controls_;
     // }
 
+    // UAirBlueprintLib::LogMessageString("Control Mode: ", "Keyboard", LogDebugLevel::Informational);
+    // current_controls_ = keyboard_controls_;
+
     //if API-client control is not active then we route keyboard/joystick control to car
     if (!vehicle_api_->isApiControlEnabled()) {
+        UAirBlueprintLib::LogMessageString("Control Mode: ", "Keyboard (aboundoned by manual user view)", LogDebugLevel::Informational);
         //all car controls from anywhere must be routed through API component
-        vehicle_api_->setCarControls(current_controls_);
-        pawn_api_->updateMovement(current_controls_);
+        // vehicle_api_->setCarControls(current_controls_);
+        // pawn_api_->updateMovement(current_controls_);
     }
     else {
         UAirBlueprintLib::LogMessageString("Control Mode: ", "API", LogDebugLevel::Informational);
         current_controls_ = vehicle_api_->getCarControls();
         pawn_api_->updateMovement(current_controls_);
+        UAirBlueprintLib::LogMessageString("Accel: ", std::to_string(current_controls_.throttle), LogDebugLevel::Informational);
+        UAirBlueprintLib::LogMessageString("Break: ", std::to_string(current_controls_.brake), LogDebugLevel::Informational);
+        UAirBlueprintLib::LogMessageString("Steering: ", std::to_string(current_controls_.steering), LogDebugLevel::Informational);
+        UAirBlueprintLib::LogMessageString("Handbrake: ", std::to_string(current_controls_.handbrake), LogDebugLevel::Informational);
+        UAirBlueprintLib::LogMessageString("Target Gear: ", std::to_string(current_controls_.manual_gear), LogDebugLevel::Informational);
     }
-    UAirBlueprintLib::LogMessageString("Accel: ", std::to_string(current_controls_.throttle), LogDebugLevel::Informational);
-    UAirBlueprintLib::LogMessageString("Break: ", std::to_string(current_controls_.brake), LogDebugLevel::Informational);
-    UAirBlueprintLib::LogMessageString("Steering: ", std::to_string(current_controls_.steering), LogDebugLevel::Informational);
-    UAirBlueprintLib::LogMessageString("Handbrake: ", std::to_string(current_controls_.handbrake), LogDebugLevel::Informational);
-    UAirBlueprintLib::LogMessageString("Target Gear: ", std::to_string(current_controls_.manual_gear), LogDebugLevel::Informational);
 }
 
 //*** Start: UpdatableState implementation ***//

@@ -27,8 +27,7 @@ public:
 
     //VehicleSimApiBase interface
     //implements game interface to update pawn
-    CarPawnSimApi(const Params& params,
-                  const msr::airlib::CarApiBase::CarControls& keyboard_controls);
+    CarPawnSimApi(const Params& params);
 
     virtual void update() override;
     virtual void reportState(StateReporter& reporter) override;
@@ -58,9 +57,6 @@ private:
     std::unique_ptr<msr::airlib::CarApiBase> vehicle_api_;
     std::unique_ptr<CarPawnApi> pawn_api_;
     std::vector<std::string> vehicle_api_messages_;
-
-    //storing reference from pawn
-    const msr::airlib::CarApiBase::CarControls& keyboard_controls_;
 
     msr::airlib::CarApiBase::CarControls joystick_controls_;
     msr::airlib::CarApiBase::CarControls current_controls_;
