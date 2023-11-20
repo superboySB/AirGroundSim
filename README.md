@@ -159,6 +159,11 @@ export PX4_SIM_HOST_ADDR=172.18.240.1
 
 为了测试后续ROS2的offboard功能，可以把我构建的docker container作为虚拟机，后续验证流程可以参考这个[教程](https://github.com/Jaeyoung-Lim/px4-offboard/blob/master/doc/ROS2_PX4_Offboard_Tutorial.md)。如果不想用两台机器，想用一台机器做，可以考虑将[我的Dockerfile](https://github.com/superboySB/AirGroundSim/blob/main/docker/ros2px4/Dockerfile)中的github-token补全，并且取消对UE、Airsim编译的注释，运行`docker build -t mypx4_image:full .`，预计会生成一个300GB左右的image，请留好空间。
 
+##### 6. 代理环境使用pip，以V2ray为例
+```
+pip install --proxy="http://127.0.0.1:10809" package-name
+```
+
 
 ## [ROS用户选用-测试中] 使用mavros
 如何在airsim上面用MAVROS给PX4无人机发送话题控制，源码编译方式同单无人机教程，需要先在“编译用容器”里编译，然后再启动“运行用容器”如下

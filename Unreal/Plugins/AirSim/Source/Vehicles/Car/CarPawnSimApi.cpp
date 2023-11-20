@@ -126,10 +126,11 @@ void CarPawnSimApi::updateCarControls()
 
         current_controls_ = joystick_controls_;
     }
-    else {
-        UAirBlueprintLib::LogMessageString("Control Mode: ", "Keyboard", LogDebugLevel::Informational);
-        current_controls_ = keyboard_controls_;
-    }
+    // [modified by superboySB] let keyborad for computer vision only
+    // else {
+    //     UAirBlueprintLib::LogMessageString("Control Mode: ", "Keyboard", LogDebugLevel::Informational);
+    //     current_controls_ = keyboard_controls_;
+    // }
 
     //if API-client control is not active then we route keyboard/joystick control to car
     if (!vehicle_api_->isApiControlEnabled()) {
