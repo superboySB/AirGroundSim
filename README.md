@@ -57,7 +57,7 @@ cd PythonClient && pip install -e .
 }
 ```
 
-我们以官方默认编译好的UE实例`Blocks`环境为例，在配置完成并启动AirSim实例后，我们可以看到一个无人机和一个无人车同时出现，他们的绝对位置和上述的定义相同。
+具体设置可以遵循[参数教程](https://microsoft.github.io/AirSim/settings/)、[摄像头教程](https://microsoft.github.io/AirSim/image_apis/#available-cameras)。我们以官方默认编译好的UE实例`Blocks`环境为例，在配置完成并启动AirSim实例后，我们可以看到一个无人机和一个无人车同时出现，他们的绝对位置和上述的定义相同。
 
 [![24789885c5c208503ce374805d5bd00.png](https://i.postimg.cc/T3Vkc4BT/24789885c5c208503ce374805d5bd00.png)](https://postimg.cc/68QLWY9P)
 
