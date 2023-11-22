@@ -25,8 +25,8 @@ cd PythonClient && pip install -e .
     "Vehicles": {
         "Drone1": {
             "VehicleType": "SimpleFlight",
-            "X": -2,
-            "Y": -2,
+            "X": 4,
+            "Y": 2,
             "Z": -3,
             "Yaw": 0
         },
@@ -35,10 +35,25 @@ cd PythonClient && pip install -e .
             "X": 0,
             "Y": 0,
             "Z": -1,
-            "Yaw": 0
+            "Yaw": 20
+        }     
+    },
+    "SubWindows": [
+        {
+            "WindowID": 0,
+            "CameraName": "fpv",
+            "ImageType": 0,
+            "VehicleName": "Car1",
+            "Visible": true
+        },
+        {
+            "WindowID": 2,
+            "CameraName": "bottom_center",
+            "ImageType": 0,
+            "VehicleName": "Drone1",
+            "Visible": true
         }
-        
-    }
+    ]
 }
 ```
 
