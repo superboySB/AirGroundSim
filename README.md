@@ -1,6 +1,9 @@
 # AirGroundSim
 同时仿真车辆和无人机以支持空地协同相关研究
 
+## What's News!
+注意，官方适配进程繁多，目前稳定版本建议使用短期维护的 [协同控制分支](https://github.com/superboySB/AirGroundSim/tree/two_joystick_control)，后续会合并到main branch
+
 ## 研究进度
 - [X] 尝试PhysX下的车机并存（暂时不支持RC切换，建议使用脚本控制）
 
