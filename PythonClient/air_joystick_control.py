@@ -13,34 +13,22 @@ pitch = 0
 roll = 0
 yaw_rate = 0
 
-client_ground = airsim.CarClient(port=41452)
-client_ground.confirmConnection()
-client_ground.enableApiControl(True, "Car1")
-car_controls = airsim.CarControls()
-
 # 初始化pygame和游戏手柄
 pygame.init()
-joystick_ground = pygame.joystick.Joystick(0)
-joystick_ground.init()
 joystick_air = pygame.joystick.Joystick(1)
 joystick_air.init()
 
+joystick_ground = pygame.joystick.Joystick(0)
+joystick_ground.init()
 
 try:
     while True:
         # 检查事件队列
         for event in pygame.event.get():
             if event.type == pygame.JOYAXISMOTION:
-                # 分别为无人车和无人机处理轴事件
-                if event.joy == 0:  # 无人车的手柄
-                    # 假设轴1控制油门
-                    if event.axis == 1:
-                        car_controls.throttle = -event.value if event.value < 0 else 0
-                        car_controls.brake = -event.value if event.value > 0 else 0
-                    # 假设轴0控制方向
-                    elif event.axis == 0:
-                        car_controls.steering = event.value
-                elif event.joy == 1:  # 无人机的手柄
+                if event.joy == 0:
+                    continue
+                else:
                     # 更新无人机的控制变量
                     # Mode 2 - 左杆垂直（左杆Y轴）控制油门，左杆水平（左杆X轴）控制偏航
                     if event.axis == 1:  # 假设左杆垂直轴是 1
@@ -54,22 +42,13 @@ try:
                     elif event.axis == 2:  # 假设右杆水平轴是 2
                         roll = event.value
 
-
         # 如果有必要，发送无人机控制命令
         if throttle != 0 or pitch != 0 or roll != 0 or yaw_rate != 0:
             client_air.moveByRollPitchYawrateThrottleAsync(roll, pitch, yaw_rate, throttle, 0.1, "Drone1").join()  # 异步后台运行
-        
-
-        # 更新无人车控制
-        if car_controls.throttle!=0 or car_controls.brake !=0 or car_controls.steering!=0:
-            client_ground.setCarControls(car_controls, "Car1")  # 占用主进程
-            time.sleep(0.1)
-
 
 except KeyboardInterrupt:
     # 断开连接
     print("从模拟器断开连接...")
-    client_ground.reset()
     client_air.reset()
     pygame.quit()
     print("模拟结束")

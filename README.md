@@ -54,10 +54,12 @@ cd PythonClient && pip install -e .
 
 [![60c88db9e04ae806f5c484b4066db71.png](https://i.postimg.cc/5yPJjtqk/60c88db9e04ae806f5c484b4066db71.png)](https://postimg.cc/SYz3vkPW)
 
-有了Airsim的UE实例，现在我们启动PythonClient节点，以基于grpc的话题订阅方式来实时读取控制流
+有了Airsim的UE实例，现在我们启动PythonClient节点，分别开启控制车机的节点，分别同时以基于grpc的话题订阅方式来实时读取控制流
 
 ```sh
-python PythonClient/two_joysticks_control_air_ground.py
+# 开启顺序最好是如下顺序：
+python PythonClient/air_joystick_control.py
+python PythonClient/car_joystick_control.py
 ```
 
 程序启动后，我们就可以分别用两个手柄同时控制无人机和无人车了，实现一个车机协同控制的简单例子。
@@ -164,3 +166,7 @@ python PythonClient/two_joysticks_control_air_ground.py
 4. 此外，团队发现原有的AirSim代码在不启动QGroundControl地面站软件的情况下，无法通过Python/ROS/原生UE中的任何一种方式来控制`PX4Multirotor`无人机，因此在`AirLib/include/vehicles/multirotor/firmwares/mavlink/MavLinkMultirotorApi.hpp`文件补全了相应的mavlink话题内容，与PX4-Autopilot的SITL节点之间进行有效地通信，确保可以不额外打开地面站软件的情况下直接控制无人机，提高平台与用户间的可交互性。
 
 [![image.png](https://i.postimg.cc/jjxyVxdk/image.png)](https://postimg.cc/18d8wZFp)
+
+## Acknowledgement
+
+The work was done when the author visited Qiyuan Lab, supervised by [Chao Wang](https://scholar.google.com/citations?user=qmDGt-kAAAAJ&hl=zh-CN).

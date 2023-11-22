@@ -1388,6 +1388,41 @@ class MultirotorClient(VehicleClient, object):
         """
         return self.client.call_async('moveByRollPitchYawrateThrottle', roll, -pitch, -yaw_rate, throttle, duration, vehicle_name)
 
+    def moveByRollPitchYawrateThrottle(self, roll, pitch, yaw_rate, throttle, duration, vehicle_name = ''):
+        """
+        - Desired throttle is between 0.0 to 1.0
+        - Roll angle, pitch angle, and yaw rate set points are given in **radians**, in the body frame.
+        - The body frame follows the Front Left Up (FLU) convention, and right-handedness.
+
+        - Frame Convention:
+            - X axis is along the **Front** direction of the quadrotor.
+
+            | Clockwise rotation about this axis defines a positive **roll** angle.
+            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t. our FLU body frame.
+
+            - Y axis is along the **Left** direction of the quadrotor.
+
+            | Clockwise rotation about this axis defines a positive **pitch** angle.
+            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t. our FLU body frame.
+
+            - Z axis is along the **Up** direction.
+
+            | Clockwise rotation about this axis defines a positive **yaw** angle.
+            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
+
+        Args:
+            roll (float): Desired roll angle, in radians.
+            pitch (float): Desired pitch angle, in radians.
+            yaw_rate (float): Desired yaw rate, in radian per second.
+            throttle (float): Desired throttle (between 0.0 to 1.0)
+            duration (float): Desired amount of time (seconds), to send this command for
+            vehicle_name (str, optional): Name of the multirotor to send this command to
+
+        Returns:
+            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+        """
+        return self.client.call('moveByRollPitchYawrateThrottle', roll, -pitch, -yaw_rate, throttle, duration, vehicle_name)
+    
     def moveByRollPitchYawrateZAsync(self, roll, pitch, yaw_rate, z, duration, vehicle_name = ''):
         """
         - z is given in local NED frame of the vehicle.
