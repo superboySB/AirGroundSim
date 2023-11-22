@@ -7,6 +7,12 @@ client_air = airsim.MultirotorClient(port=41451)
 client_air.confirmConnection()
 client_air.enableApiControl(True, "Drone1")
 client_air.armDisarm(True, "Drone1")
+
+# 预先起飞
+f1 = client_air.takeoffAsync(vehicle_name="Drone1")
+f1.join()
+print("飞机已经启动！请开始控制飞机。")
+
 # 初始控制变量
 throttle = 0
 pitch = 0

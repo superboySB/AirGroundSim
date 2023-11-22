@@ -47,8 +47,15 @@ cd PythonClient && pip install -e .
             "Visible": true
         },
         {
-            "WindowID": 2,
+            "WindowID": 1,
             "CameraName": "bottom_center",
+            "ImageType": 0,
+            "VehicleName": "Drone1",
+            "Visible": true
+        }
+        {
+            "WindowID": 2,
+            "CameraName": "front_center",
             "ImageType": 0,
             "VehicleName": "Drone1",
             "Visible": true
