@@ -82,14 +82,17 @@ void MultirotorPawnSimApi::updateRenderedState(float dt)
     
     // [modified by superboySB]
     // When specifying this attribute, you can allow the remote control to take over the control at any time.
-    if (getRemoteControlID() >= 0)
-        // vehicle_api_->setRCData(getRCData());
-        rc_data = getRCData();
-        UAirBlueprintLib::LogMessageString("get rc_data (Pitch-rightY-x / Roll-rightX-y / Throttle-leftY-z / Yaw-leftX-r): ",
-                                            Utils::stringf("%f %f %f %f",rc_data.pitch, rc_data.roll, rc_data.throttle, rc_data.yaw),
-                                            LogDebugLevel::Informational);
-        // TODO: DZP SITL test（maybe add NN w/o ROS）
-        vehicle_api_->setRCData(rc_data);
+    // if (getRemoteControlID() >= 0)
+    int rc_id = getRemoteControlID();
+    if (rc_id >= 0) rc_data = getRCData();
+    // UAirBlueprintLib::LogMessageString("get rc_data (Pitch-rightY-x / Roll-rightX-y / Throttle-leftY-z / Yaw-leftX-r): ",
+    //                                     Utils::stringf("%f %f %f %f",rc_data.pitch, rc_data.roll, rc_data.throttle, rc_data.yaw),
+    //                                     Utils::stringf("%f %f %f %f [RemoteControlID:%d]",rc_data.pitch, rc_data.roll, rc_data.throttle, rc_data.yaw,rc_id),
+    //                                     LogDebugLevel::Informational);
+    // TODO: DZP SITL test（maybe add NN w/o ROS）
+    // vehicle_api_->setRCData(rc_data);
+    // [modified by superboySB] 粗暴解决联控问题
+    // vehicle_api_->setRCData(rc_data); 
     rotor_states_.timestamp = clock()->nowNanos();
     vehicle_api_->setRotorStates(rotor_states_);
 }

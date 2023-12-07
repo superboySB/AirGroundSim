@@ -238,23 +238,23 @@ msr::airlib::RCData PawnSimApi::getRCData() const
     rc_data_.is_valid = joystick_state_.is_valid;
 
     if (rc_data_.is_valid) {
-        // //-1 to 1 --> 0 to 1
-        // rc_data_.throttle = (joystick_state_.left_y + 1) / 2;
+        // -1 to 1 --> 0 to 1
+        rc_data_.throttle = (joystick_state_.left_y + 1) / 2;
 
-        // //-1 to 1
-        // rc_data_.yaw = joystick_state_.left_x;
-        // rc_data_.roll = joystick_state_.right_x;
-        // rc_data_.pitch = -joystick_state_.right_y;
+        // -1 to 1
+        rc_data_.yaw = joystick_state_.left_x;
+        rc_data_.roll = joystick_state_.right_x;
+        rc_data_.pitch = -joystick_state_.right_y;
 
         //these will be available for devices like steering wheels
-        // rc_data_.left_z = joystick_state_.left_z;
-        // rc_data_.right_z = joystick_state_.right_z;
+        rc_data_.left_z = joystick_state_.left_z;
+        rc_data_.right_z = joystick_state_.right_z;
 
         // TODO: DZP：改为左手油，俯仰（pitch）的设置是反人性的，其他的都还可以
-        rc_data_.throttle = -joystick_state_.right_x ;
-        rc_data_.yaw = joystick_state_.left_y;
-        rc_data_.roll = -joystick_state_.right_y;
-        rc_data_.pitch = -joystick_state_.right_z; 
+        // rc_data_.throttle = -joystick_state_.right_x ;
+        // rc_data_.yaw = joystick_state_.left_y;
+        // rc_data_.roll = -joystick_state_.right_y;
+        // rc_data_.pitch = -joystick_state_.right_z; 
 
         
         rc_data_.switches = joystick_state_.buttons;
@@ -266,7 +266,7 @@ msr::airlib::RCData PawnSimApi::getRCData() const
         
         // UAirBlueprintLib::LogMessageString("left_xyz,right_xyz: ", Utils::stringf("%f, %f, %f, %f, %f, %f", joystick_state_.left_x,joystick_state_.left_y,joystick_state_.left_z,joystick_state_.right_x,joystick_state_.right_y,joystick_state_.right_z), LogDebugLevel::Informational);
 
-        // UAirBlueprintLib::LogMessageString("Joystick (T,R,P,Y,Buttons): ", Utils::stringf("%f, %f, %f %f, %s", rc_data_.throttle, rc_data_.roll, rc_data_.pitch, rc_data_.yaw, Utils::toBinaryString(joystick_state_.buttons).c_str()), LogDebugLevel::Informational);
+        UAirBlueprintLib::LogMessageString("Joystick (T,R,P,Y,Buttons): ", Utils::stringf("%f, %f, %f %f, %s", rc_data_.throttle, rc_data_.roll, rc_data_.pitch, rc_data_.yaw, Utils::toBinaryString(joystick_state_.buttons).c_str()), LogDebugLevel::Informational);
 
         //TODO: should below be at controller level info?
         UAirBlueprintLib::LogMessageString("RC Mode: ", rc_data_.getSwitch(0) == 0 ? "Angle" : "Rate", LogDebugLevel::Informational);

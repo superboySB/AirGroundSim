@@ -100,6 +100,8 @@ void ACameraDirector::initializeForBeginPlay(ECameraDirectorMode view_mode,
 void ACameraDirector::attachSpringArm(bool attach)
 {
     if (attach) {
+        // 取消玩家视角跟随模式
+        attach = false;
         //If we do have actor to follow AND don't have sprint arm attached to that actor, we will attach it
         if (follow_actor_ && ExternalCamera->GetRootComponent()->GetAttachParent() != SpringArm) {
             //For car, we want a bit of camera lag, as that is customary of racing video games
