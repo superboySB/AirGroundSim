@@ -189,17 +189,8 @@ python3 drone_follow_car.py
 ```
 第3步结束后，可以选择先打开这个玩意，让飞机稳定，然后就可以打开第5步、第8步，我依然加入了拍照的功能，每10秒拍一张，存工作目录下。
 
-### 第7步：启动Linux服务侧的mavros节点（正式演示用，与第4、5、6步互斥）
-我把第4步、第5步的`调试用`功能与建飞老师写的主要代码，尝试集成在了一起，相当于建飞老师的代码现在可以直接调用airsim client的api来获取车的信息，我觉得这样对后续开发简单一点，不然这些信息的处理就要交给win编程，发特定的话题给mavros，那样子首先在windows里面写其它信息的socket、然后转码后又转ros topics，写这玩意我就有点麻，先按好写的写。
-```sh
-# todo 主要是我忘记了ros2与mavros用法了....
-# todo 主要是我忘记了ros2与mavros用法了....
-# todo 主要是我忘记了ros2与mavros用法了....
-# todo 主要是我忘记了ros2与mavros用法了....
-# todo 主要是我忘记了ros2与mavros用法了....
-```
 
-### 第8步：启动Windows仿真侧的车辆手柄信令发送端
+### 第7步：启动Windows仿真侧的车辆手柄信令发送端
 现在我们运行socket实例的发送端节点，发送手柄信息给服务端，这个代码里看到的ip指的是服务端ip，如果你都用的是一台linux跑可视化+算法，其实设置为`localhost`也没关系，这里不再赘述:
 ```sh
 cd src/air-ground-sim/PythonClient

@@ -12,8 +12,12 @@ void ASimModeWorldBase::BeginPlay()
 void ASimModeWorldBase::initializeForPlay()
 {
     std::vector<msr::airlib::UpdatableObject*> vehicles;
-    for (auto& api : getApiProvider()->getVehicleSimApis())
-        vehicles.push_back(api);
+    for (auto& api : getApiProvider()->getVehicleSimApis()){
+        // [add by pengfei] to solve double push backs of car
+        // std::string v_type = api->getVehicleSetting()->vehicle_type;
+        // if (v_type == "simpleflight" || v_type == "px4multirotor")
+            vehicles.push_back(api);
+    }
     //TODO: directly accept getVehicleSimApis() using generic container
 
     std::unique_ptr<PhysicsEngineBase> physics_engine = createPhysicsEngine();
@@ -150,9 +154,12 @@ void ASimModeWorldBase::Tick(float DeltaSeconds)
         physics_world_->enableStateReport(EnableReport);
         physics_world_->updateStateReport();
 
-        for (auto& api : getApiProvider()->getVehicleSimApis())
-            api->updateRenderedState(DeltaSeconds);
-
+        for (auto& api : getApiProvider()->getVehicleSimApis()){
+            // [add by pengfei] to solve double push backs of car
+            std::string v_type = api->getVehicleSetting()->vehicle_type;
+            if (v_type == "simpleflight" || v_type == "px4multirotor")
+                api->updateRenderedState(DeltaSeconds);
+        }
         physics_world_->unlock();
     }
 
